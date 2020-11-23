@@ -31,5 +31,11 @@ namespace PetApi.Controllers
         {
             pets.Clear();
         }
+
+        [HttpGet("{name:alpha}")]
+        public Pet GetByName(string name)
+        {
+            return pets.FirstOrDefault(pet => pet.Name == name);
+        }
     }
 }
