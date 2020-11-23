@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,6 +78,29 @@ namespace PetApiTest
             //then
             response.EnsureSuccessStatusCode();
             Assert.Equal(pets[0], actualPet);
+        }
+
+        [Fact]
+        public async Task Should_Delete_Pet_By_Name_When_Delete_PetAsync()
+        {
+            //given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            List<Pet> pets = new List<Pet>() { new Pet("Meow", "cat", "white", 3000), new Pet("Pink", "cat", "black", 3000) };
+            foreach (var pet in pets)
+            {
+                string request = JsonConvert.SerializeObject(pet);
+                StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+                await client.PostAsync("petStore/addNewPet", requestBody);
+            }
+
+            //when
+            await client.DeleteAsync($"petStore/deletePetByName/{pets[0].Name}");
+            var response = await client.GetAsync($"petStore/getPetByName/{pets[0].Name}");
+
+            //then
+            Assert.True(response.StatusCode == HttpStatusCode.NoContent);
         }
     }
 }

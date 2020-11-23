@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ namespace PetApi.Controllers
     [Route("[controller]")]
     public class PetStoreController : ControllerBase
     {
-        private static IList<Pet> pets = new List<Pet>();
+        private static List<Pet> pets = new List<Pet>();
 
         [HttpPost("addNewPet")]
         public Pet AddNewPet(Pet pet)
@@ -33,7 +34,14 @@ namespace PetApi.Controllers
                 from pet in pets
                 where pet.Name == petName
                 select pet;
-            return foundPets.ToList()[0];
+            return foundPets.ToList().Count == 0 ? null : foundPets.ToList()[0];
+        }
+
+        [HttpDelete("deletePetByName/{petName}")]
+        public void DeletePetByName(string petName)
+        {
+            var deletePet = pets.Find(pet => pet.Name == petName);
+            pets.Remove(deletePet);
         }
 
         [HttpDelete("clear")]
