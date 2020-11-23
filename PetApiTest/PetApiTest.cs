@@ -36,9 +36,9 @@ namespace PetApiTest
             Assert.Equal(pet, actualPet);
         }
 
-        // petStore/Pets
+        // petStore/Pets/{name}
         [Fact]
-        public async void Should_Return_Correct_Pets_When_Get_All_Pet()
+        public async void Should_Return_Correct_Pets_When_Get_All_Pets()
         {
             // given
             TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
@@ -63,6 +63,33 @@ namespace PetApiTest
         }
 
         // petStore/Pets/{name}
+        [Fact]
+        public async void Should_Get_Pet_Off_When_Buy_Pet_By_Name()
+        {
+            // given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+
+            await client.DeleteAsync("petStore/clear");
+
+            Pet pet = new Pet("Tom", "dog", "white", 5000);
+            string request = JsonConvert.SerializeObject(pet);
+            StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestBody);
+
+            // when
+            await client.DeleteAsync($"petStore/Pets/{pet.Name}");
+            var response = await client.GetAsync("petStore/Pets");
+
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualPet = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+
+            Assert.Equal(new List<Pet>(), actualPet);
+        }
+
+        // petStore/Pets/{name}/bought
         [Fact]
         public async void Should_Return_Correct_Pet_When_Get_Pet_By_Name()
         {

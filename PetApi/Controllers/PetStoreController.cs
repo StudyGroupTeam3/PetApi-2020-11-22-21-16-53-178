@@ -33,6 +33,12 @@ namespace PetApi.Controllers
             return pets.FirstOrDefault(pet => pet.Name == name);
         }
 
+        [HttpDelete("Pets/{name}")]
+        public void BuyPetByName(string name)
+        {
+            pets.Remove(pets.FirstOrDefault(pet => pet.Name == name));
+        }
+
         [HttpDelete("clear")]
         public void Clear()
         {
