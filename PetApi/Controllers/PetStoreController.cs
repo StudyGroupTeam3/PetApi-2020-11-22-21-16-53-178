@@ -37,5 +37,11 @@ namespace PetApi.Controllers
         {
             return pets.FirstOrDefault(pet => pet.Name == name);
         }
+
+        [HttpDelete("{name:alpha}")]
+        public void GetOffShelf(string name)
+        {
+            pets.RemoveAt(pets.Where((pet, index) => pet.Name == name).Select((pet, index) => new { pet, index }).ToList().First().index);
+        }
     }
 }
