@@ -21,6 +21,13 @@ namespace PetApi.Controllers
             return pet;
         }
 
+        [HttpPut("modifyPet/{petName}")]
+        public void ModifyPet(string petName, Pet newPet)
+        {
+            var index = pets.FindIndex(pet => pet.Name == petName);
+            pets[index] = newPet;
+        }
+
         [HttpGet("pets")]
         public IList<Pet> GetAllPet()
         {
