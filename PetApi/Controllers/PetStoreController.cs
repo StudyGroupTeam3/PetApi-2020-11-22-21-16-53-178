@@ -11,6 +11,7 @@ namespace PetApi.Controllers
     [Route("[controller]")]
     public class PetStoreController : ControllerBase
     {
+        // static is important
         private static IList<Pet> pets = new List<Pet>();
 
         [HttpPost("addNewPet")]
@@ -24,6 +25,12 @@ namespace PetApi.Controllers
         public IList<Pet> GetPets()
         {
             return pets;
+        }
+
+        [HttpGet("Pets/{name}")]
+        public Pet GetPetByName(string name)
+        {
+            return pets.FirstOrDefault(pet => pet.Name == name);
         }
 
         [HttpDelete("clear")]
