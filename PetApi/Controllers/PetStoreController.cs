@@ -40,6 +40,15 @@ namespace PetApi.Controllers
             return pets.Where(pet => pet.Name == name).ToList()[0];
         }
 
+        [HttpGet("getByPriceRange/{priceRange}")]
+        public List<Pet> GetPetsByPriceRange(string priceRange)
+        {
+            var input = priceRange.Split("-");
+            int lowerPrice = int.Parse(input[0]);
+            int upperPrice = int.Parse(input[1]);
+            return pets.Where(pet => pet.Price >= lowerPrice && pet.Price <= upperPrice).ToList();
+        }
+
         [HttpDelete("clear")]
         public void Clear()
         {
