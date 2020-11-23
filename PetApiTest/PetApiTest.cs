@@ -110,7 +110,7 @@ namespace PetApiTest
             TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
             HttpClient client = server.CreateClient();
             await client.DeleteAsync("petStore/clear");
-            List<Pet> pets = new List<Pet>() { new Pet("Meow", "cat", "white", 3000), new Pet("Pink", "cat", "black", 3000) };
+            List<Pet> pets = new List<Pet>() { new Pet("Meow", "cat", "white", 3000), new Pet("Meow", "cat", "white", 4000) };
             string postRequest = JsonConvert.SerializeObject(pets[0]);
             StringContent postRequestBody = new StringContent(postRequest, Encoding.UTF8, "application/json");
             await client.PostAsync("petStore/addNewPet", postRequestBody);
