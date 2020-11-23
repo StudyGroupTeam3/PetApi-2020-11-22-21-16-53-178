@@ -28,7 +28,7 @@ namespace PetApi.Controllers
             return pets;
         }
 
-        [HttpGet("GetOnePet/{name}")]
+        [HttpGet("getOnePet/{name}")]
         public Pet GetPetByName(string name)
         {
             return pets.Where(pet => pet.Name == name).ToList()[0];
@@ -40,12 +40,28 @@ namespace PetApi.Controllers
             pets.Clear();
         }
 
-        [HttpDelete("DeleteOnePet/{name}")]
+        [HttpDelete("deleteOnePet/{name}")]
         public List<Pet> DeleteByName(string name)
         {
             Pet petToDelete = pets.Where(pet => pet.Name == name).ToList()[0];
             pets.Remove(petToDelete);
             return pets;
+        }
+
+        [HttpPatch("newPriceInfo")]
+        public Pet UpdatePetPrice(UpdateModel update)
+        {
+            Pet result = new Pet();
+            foreach (var pet in pets)
+            {
+                if (pet.Name == update.Name)
+                {
+                    pet.Price = update.Price;
+                    result = pet;
+                }
+            }
+
+            return result;
         }
     }
 }
