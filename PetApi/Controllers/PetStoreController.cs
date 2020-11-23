@@ -51,13 +51,11 @@ namespace PetApi.Controllers
         }
 
         [HttpGet]
-        public List<Pet> GetByProperty(string type, string color)
+        public List<Pet> GetByProperty(string type, string color, double? minPrice, double? maxPrice)
         {
-            return pets.Where(pet =>
-            {
-                return (string.IsNullOrEmpty(type) || pet.Type == type) &&
-                       (string.IsNullOrEmpty(color) || pet.Color == color);
-            }).ToList();
+            return pets.Where(pet => (string.IsNullOrEmpty(type) || pet.Type == type) &&
+                                     (string.IsNullOrEmpty(color) || pet.Color == color) &&
+                                     ((!minPrice.HasValue || pet.Price >= minPrice) && (!maxPrice.HasValue || pet.Price <= maxPrice))).ToList();
         }
     }
 

@@ -166,5 +166,29 @@ namespace PetApiTest
             var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
             Assert.Equal(new List<Pet>() { petCat }, actualPets);
         }
+
+        [Fact]
+        public async Task Should_Return_List_Of_Pets_Of_Specified_Price_Range_When_Find_Pets_By_Prince_Range()
+        {
+            // given
+            TestServer testServer = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = testServer.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            Pet petDog = new Pet("Baymax", "dog", "white", 5000);
+            string requestDog = JsonConvert.SerializeObject(petDog);
+            StringContent requestDogBody = new StringContent(requestDog, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestDogBody);
+            Pet petCat = new Pet("Jack", "cat", "orange", 6000);
+            string requestCat = JsonConvert.SerializeObject(petCat);
+            StringContent requestCatBody = new StringContent(requestCat, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestCatBody);
+            // when
+            var response = await client.GetAsync("petStore/?minPrice=4500&&maxPrice=5500");
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+            Assert.Equal(new List<Pet>() { petDog }, actualPets);
+        }
     }
 }
