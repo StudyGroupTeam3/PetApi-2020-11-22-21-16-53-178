@@ -47,10 +47,19 @@ namespace PetApi.Controllers
         [HttpGet("getPetsByType/{petType}")]
         public IList<Pet> GetPetsByType(string petType)
         {
-            var s = pets;
             IEnumerable<Pet> foundPets =
                 from pet in pets
                 where pet.Type == petType
+                select pet;
+            return foundPets.ToList().Count == 0 ? null : foundPets.ToList();
+        }
+
+        [HttpGet("getPetsByColor/{petColor}")]
+        public IList<Pet> GetPetsByColor(string petColor)
+        {
+            IEnumerable<Pet> foundPets =
+                from pet in pets
+                where pet.Color == petColor
                 select pet;
             return foundPets.ToList().Count == 0 ? null : foundPets.ToList();
         }
