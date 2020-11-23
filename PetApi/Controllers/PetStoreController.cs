@@ -49,6 +49,12 @@ namespace PetApi.Controllers
         {
             pets.FirstOrDefault(pet => pet.Name == name).Price = petPriceModifyModel.Price;
         }
+
+        [HttpGet]
+        public List<Pet> GetByProperty(string type)
+        {
+            return pets.Where(pet => pet.Type == type).ToList();
+        }
     }
 
     public class PetPriceModifyModel

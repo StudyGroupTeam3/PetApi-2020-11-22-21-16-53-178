@@ -86,8 +86,7 @@ namespace PetApiTest
             StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
             await client.PostAsync("petStore/addNewPet", requestBody);
             // when
-            var response = await client.DeleteAsync("petStore/Baymax");
-            response.EnsureSuccessStatusCode();
+            await client.DeleteAsync("petStore/Baymax");
             // then
             var responseGetAllPets = await client.GetAsync("petStore/pets");
             responseGetAllPets.EnsureSuccessStatusCode();
@@ -111,14 +110,37 @@ namespace PetApiTest
             PetPriceModifyModel petPriceModifyModel = new PetPriceModifyModel(2000);
             string patchRequest = JsonConvert.SerializeObject(petPriceModifyModel);
             StringContent patchRequestBody = new StringContent(patchRequest, Encoding.UTF8, "application/json");
-            var response = await client.PatchAsync("petStore/Baymax", patchRequestBody);
-            response.EnsureSuccessStatusCode();
+            await client.PatchAsync("petStore/Baymax", patchRequestBody);
             // then
             var responseGetPet = await client.GetAsync("petStore/Baymax");
             responseGetPet.EnsureSuccessStatusCode();
             var responseString = await responseGetPet.Content.ReadAsStringAsync();
             var actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
             Assert.True(actualPet.Price == 2000);
+        }
+
+        [Fact]
+        public async Task Should_Return_List_Of_Pets_Of_Specified_Type_When_Get_Pets_By_Type()
+        {
+            // given
+            TestServer testServer = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = testServer.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            Pet petDog = new Pet("Baymax", "dog", "white", 5000);
+            string requestDog = JsonConvert.SerializeObject(petDog);
+            StringContent requestDogBody = new StringContent(requestDog, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestDogBody);
+            Pet petCat = new Pet("Jack", "cat", "orange", 6000);
+            string requestCat = JsonConvert.SerializeObject(petCat);
+            StringContent requestCatBody = new StringContent(requestCat, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestCatBody);
+            // when
+            var response = await client.GetAsync("petStore/?type=dog");
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+            Assert.Equal(new List<Pet>() { petDog }, actualPets);
         }
     }
 }
