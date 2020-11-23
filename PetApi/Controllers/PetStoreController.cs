@@ -43,5 +43,25 @@ namespace PetApi.Controllers
         {
             pets.RemoveAt(pets.Where((pet, index) => pet.Name == name).Select((pet, index) => new { pet, index }).ToList().First().index);
         }
+
+        [HttpPatch("{name:alpha}")]
+        public void ModifyPetPrice(string name, PetPriceModifyModel petPriceModifyModel)
+        {
+            pets.FirstOrDefault(pet => pet.Name == name).Price = petPriceModifyModel.Price;
+        }
+    }
+
+    public class PetPriceModifyModel
+    {
+        public PetPriceModifyModel()
+        {
+        }
+
+        public PetPriceModifyModel(double price)
+        {
+            this.Price = price;
+        }
+
+        public double Price { get; set; }
     }
 }

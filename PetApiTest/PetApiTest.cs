@@ -87,11 +87,38 @@ namespace PetApiTest
             await client.PostAsync("petStore/addNewPet", requestBody);
             // when
             var response = await client.DeleteAsync("petStore/Baymax");
-            // then
             response.EnsureSuccessStatusCode();
-            var responseString = await response.Content.ReadAsStringAsync();
+            // then
+            var responseGetAllPets = await client.GetAsync("petStore/pets");
+            responseGetAllPets.EnsureSuccessStatusCode();
+            var responseString = await responseGetAllPets.Content.ReadAsStringAsync();
             var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
-            Assert.Null(actualPets);
+            Assert.True(actualPets.Count == 0);
+        }
+
+        [Fact]
+        public async Task Should_Change_Price_Of_Pet_When_Modify_Pet_Price()
+        {
+            // given
+            TestServer testServer = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = testServer.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            Pet pet = new Pet("Baymax", "dog", "white", 5000);
+            string request = JsonConvert.SerializeObject(pet);
+            StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestBody);
+            // when
+            PetPriceModifyModel petPriceModifyModel = new PetPriceModifyModel(2000);
+            string patchRequest = JsonConvert.SerializeObject(petPriceModifyModel);
+            StringContent patchRequestBody = new StringContent(patchRequest, Encoding.UTF8, "application/json");
+            var response = await client.PatchAsync("petStore/Baymax", patchRequestBody);
+            response.EnsureSuccessStatusCode();
+            // then
+            var responseGetPet = await client.GetAsync("petStore/Baymax");
+            responseGetPet.EnsureSuccessStatusCode();
+            var responseString = await responseGetPet.Content.ReadAsStringAsync();
+            var actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
+            Assert.True(actualPet.Price == 2000);
         }
     }
 }
