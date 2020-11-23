@@ -1,40 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using PetApi;
-using PetApi.Controllers;
 using PetApi.Models;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
 using Xunit;
 
 namespace PetApiTest
 {
-    public class PetApiTest
+    public class PetApiTest : IDisposable
     {
+        private readonly TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+        private readonly HttpClient client;
+        public PetApiTest()
+        {
+            client = server.CreateClient();
+            client.DeleteAsync("petStore/clear");
+        }
+
+        public void Dispose()
+        {
+        }
+
         // petStore/addNewPet
         [Fact]
         public async void Should_Add_Pet_When_Add_Pet()
         {
             // given
-            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
-            HttpClient client = server.CreateClient();
-
-            Pet pet = new Pet("Bavmax", "dog", "white", 5000);
-            string request = JsonConvert.SerializeObject(pet);
-            StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            var pet = new Pet("Bavmax", "dog", "white", 5000);
+            var request = JsonConvert.SerializeObject(pet);
+            var requestBody = new StringContent(request, Encoding.UTF8, "application/json");
 
             // when
-            var response = await client.PostAsync("petStore/addNewPet", requestBody);
+            await client.PostAsync("petStore/addNewPet", requestBody);
+            var response = await client.GetAsync("petStore/pets");
 
             // then
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
-            Pet actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
+            var actualPetList = JsonConvert.DeserializeObject<List<Pet>>(responseString);
 
-            Assert.Equal(pet, actualPet);
+            Assert.Equal(new List<Pet>() { pet }, actualPetList);
         }
 
         // petStore/Pets/{name}
