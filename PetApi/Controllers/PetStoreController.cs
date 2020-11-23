@@ -57,6 +57,13 @@ namespace PetApi.Controllers
             return pets.Where(x => x.Type == type).ToList();
         }
 
+        [HttpGet]
+        [Route("FindPetByItsColor/")]
+        public List<Pet> GetPetByItsColor(string color)
+        {
+            return pets.Where(x => x.Color == color).ToList();
+        }
+
         [HttpDelete("clear")]
         public void Clear()
         {
