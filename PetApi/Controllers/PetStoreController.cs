@@ -55,7 +55,8 @@ namespace PetApi.Controllers
         {
             return pets.Where(pet => (string.IsNullOrEmpty(type) || pet.Type == type) &&
                                      (string.IsNullOrEmpty(color) || pet.Color == color) &&
-                                     ((!minPrice.HasValue || pet.Price >= minPrice) && (!maxPrice.HasValue || pet.Price <= maxPrice))).ToList();
+                                     (!minPrice.HasValue || pet.Price >= minPrice) &&
+                                     (!maxPrice.HasValue || pet.Price <= maxPrice)).ToList();
         }
     }
 
