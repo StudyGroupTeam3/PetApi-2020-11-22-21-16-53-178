@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading.Tasks;
@@ -60,6 +62,18 @@ namespace PetApi.Controllers
             IEnumerable<Pet> foundPets =
                 from pet in pets
                 where pet.Color == petColor
+                select pet;
+            return foundPets.ToList().Count == 0 ? null : foundPets.ToList();
+        }
+
+        [HttpGet("getPetsByPriceRange/{priceRange}")]
+        public IList<Pet> GetPetsByPriceRange(string priceRange)
+        {
+            double.TryParse(priceRange.Split("-")[0], out double startRange);
+            double.TryParse(priceRange.Split("-")[1], out double endRange);
+            IEnumerable<Pet> foundPets =
+                from pet in pets
+                where pet.Price > startRange && pet.Price < endRange
                 select pet;
             return foundPets.ToList().Count == 0 ? null : foundPets.ToList();
         }

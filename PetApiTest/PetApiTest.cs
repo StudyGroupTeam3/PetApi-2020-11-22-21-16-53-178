@@ -176,5 +176,30 @@ namespace PetApiTest
             response.EnsureSuccessStatusCode();
             Assert.Equal(new List<Pet>() { pets[0], pets[1] }, actualPets);
         }
+
+        [Fact]
+        public async Task Should_Return_Correct_Pets_When_Find_By_Price_RangeAsync()
+        {
+            //given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            List<Pet> pets = new List<Pet>() { new Pet("Meow", "cat", "white", 5000), new Pet("Duck", "dog", "white", 2000), new Pet("Pink", "cat", "black", 3000) };
+            foreach (var pet in pets)
+            {
+                string request = JsonConvert.SerializeObject(pet);
+                StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+                await client.PostAsync("petStore/addNewPet", requestBody);
+            }
+
+            // when
+            var response = await client.GetAsync("petStore/getPetsByPriceRange/1000-4000");
+            var responseString = await response.Content.ReadAsStringAsync();
+            List<Pet> actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+
+            //then
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(new List<Pet>() { pets[1], pets[2] }, actualPets);
+        }
     }
 }
