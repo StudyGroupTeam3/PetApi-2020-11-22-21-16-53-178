@@ -51,9 +51,13 @@ namespace PetApi.Controllers
         }
 
         [HttpGet]
-        public List<Pet> GetByProperty(string type)
+        public List<Pet> GetByProperty(string type, string color)
         {
-            return pets.Where(pet => pet.Type == type).ToList();
+            return pets.Where(pet =>
+            {
+                return (string.IsNullOrEmpty(type) || pet.Type == type) &&
+                       (string.IsNullOrEmpty(color) || pet.Color == color);
+            }).ToList();
         }
     }
 

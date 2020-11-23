@@ -120,7 +120,7 @@ namespace PetApiTest
         }
 
         [Fact]
-        public async Task Should_Return_List_Of_Pets_Of_Specified_Type_When_Get_Pets_By_Type()
+        public async Task Should_Return_List_Of_Pets_Of_Specified_Type_When_Find_Pets_By_Type()
         {
             // given
             TestServer testServer = new TestServer(new WebHostBuilder().UseStartup<Startup>());
@@ -141,6 +141,30 @@ namespace PetApiTest
             var responseString = await response.Content.ReadAsStringAsync();
             var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
             Assert.Equal(new List<Pet>() { petDog }, actualPets);
+        }
+
+        [Fact]
+        public async Task Should_Return_List_Of_Pets_Of_Specified_Color_When_Find_Pets_By_Color()
+        {
+            // given
+            TestServer testServer = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = testServer.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+            Pet petDog = new Pet("Baymax", "dog", "white", 5000);
+            string requestDog = JsonConvert.SerializeObject(petDog);
+            StringContent requestDogBody = new StringContent(requestDog, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestDogBody);
+            Pet petCat = new Pet("Jack", "cat", "orange", 6000);
+            string requestCat = JsonConvert.SerializeObject(petCat);
+            StringContent requestCatBody = new StringContent(requestCat, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestCatBody);
+            // when
+            var response = await client.GetAsync("petStore/?color=orange");
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+            Assert.Equal(new List<Pet>() { petCat }, actualPets);
         }
     }
 }
