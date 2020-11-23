@@ -28,7 +28,7 @@ namespace PetApi.Controllers
             return pets;
         }
 
-        [HttpGet("pets/{name}")]
+        [HttpGet("GetOnePet/{name}")]
         public Pet GetPetByName(string name)
         {
             return pets.Where(pet => pet.Name == name).ToList()[0];
@@ -38,6 +38,14 @@ namespace PetApi.Controllers
         public void Clear()
         {
             pets.Clear();
+        }
+
+        [HttpDelete("DeleteOnePet/{name}")]
+        public List<Pet> DeleteByName(string name)
+        {
+            Pet petToDelete = pets.Where(pet => pet.Name == name).ToList()[0];
+            pets.Remove(petToDelete);
+            return pets;
         }
     }
 }

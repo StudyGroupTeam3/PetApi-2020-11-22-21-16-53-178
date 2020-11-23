@@ -73,13 +73,40 @@ namespace PetApiTest
             await client.PostAsync("petStore/addNewPet", requestBody1);
 
             //when
-            var response = await client.GetAsync($"petStore/pets/{name}");
+            var response = await client.GetAsync($"petStore/GetOnePet/{name}");
             var responseString = await response.Content.ReadAsStringAsync();
             Pet actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
 
             //then
             response.EnsureSuccessStatusCode();
             Assert.Equal(pet, actualPet);
+        }
+
+        [Fact]
+        public async Task Should_DeleteByPetName_Succeed()
+        {
+            //given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+            Pet pet = new Pet(name: "Hello", type: "cat", color: "white", price: 3000);
+            Pet pet1 = new Pet(name: "Kitty", type: "cat", color: "black", price: 3000);
+            var name = pet.Name;
+            string request = JsonConvert.SerializeObject(pet);
+            string request1 = JsonConvert.SerializeObject(pet1);
+            StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            StringContent requestBody1 = new StringContent(request1, Encoding.UTF8, "application/json");
+            await client.DeleteAsync("petStore/clear");
+            await client.PostAsync("petStore/addNewPet", requestBody);
+            await client.PostAsync("petStore/addNewPet", requestBody1);
+
+            //when
+            var response = await client.DeleteAsync($"petStore/DeleteOnePet/{name}");
+            var responseString = await response.Content.ReadAsStringAsync();
+            List<Pet> actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+
+            //then
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(new List<Pet>() { pet1 }, actualPets);
         }
     }
 }
