@@ -73,7 +73,6 @@ namespace PetApiTest
             await client.PostAsync("PetStore/addNewPet", requestBody2);
 
             // when
-            //var response = await client.GetAsync("PetStore/FindPetByItsName?name=Baymas");
             var response = await client.GetAsync("PetStore/Baymas");
             // then
             response.EnsureSuccessStatusCode();
@@ -131,6 +130,31 @@ namespace PetApiTest
             var responseString = await response.Content.ReadAsStringAsync();
             Pet acutalPet = JsonConvert.DeserializeObject<Pet>(responseString);
             Assert.NotEqual(pet1.Price, acutalPet.Price);
+        }
+
+        [Fact]
+        public async Task Should_Find_Pet_When_Give_Pet_Type()
+        {
+            // given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+
+            Pet pet1 = new Pet(name: "Wang", type: "dog", color: "White", price: 5000);
+            Pet pet2 = new Pet(name: "Miao", type: "cat", color: "White", price: 5000);
+            string request1 = JsonConvert.SerializeObject(pet1);
+            string request2 = JsonConvert.SerializeObject(pet2);
+            StringContent requestBody1 = new StringContent(request1, Encoding.UTF8, "application/json");
+            StringContent requestBody2 = new StringContent(request2, Encoding.UTF8, "application/json");
+            await client.PostAsync("PetStore/addNewPet", requestBody1);
+            await client.PostAsync("PetStore/addNewPet", requestBody2);
+
+            // when
+            var response = await client.GetAsync("PetStore/FindPetByItsType?type=dog");
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            List<Pet> acutalPet = JsonConvert.DeserializeObject<List<Pet>>(responseString);
+            Assert.True(acutalPet.Contains(pet1));
         }
     }
 }

@@ -28,7 +28,6 @@ namespace PetApi.Controllers
 
         [HttpGet]
         [Route("{name?}")]
-        //[Route("FindPetByItsName/")]
         public Pet GetPetByItsName(string name)
         {
             return pets.FirstOrDefault(x => x.Name == name);
@@ -49,6 +48,13 @@ namespace PetApi.Controllers
             var modifiedPet = pets.FirstOrDefault(x => x.Name == pet.Name);
             modifiedPet.Price = pet.Price;
             return modifiedPet;
+        }
+
+        [HttpGet]
+        [Route("FindPetByItsType/")]
+        public List<Pet> GetPetByItsType(string type)
+        {
+            return pets.Where(x => x.Type == type).ToList();
         }
 
         [HttpDelete("clear")]
