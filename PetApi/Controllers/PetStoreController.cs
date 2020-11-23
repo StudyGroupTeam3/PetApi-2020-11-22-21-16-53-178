@@ -39,6 +39,20 @@ namespace PetApi.Controllers
             return pets.Where(pet => pet.Type == type).ToList();
         }
 
+        [HttpGet("Pets/color/{color}")]
+        public List<Pet> GetPetByColor(string color)
+        {
+            return pets.Where(pet => pet.Color == color).ToList();
+        }
+
+        [HttpGet("Pets/price/{priceRange}")]
+        public List<Pet> GetPetInPriceRange(string priceRange)
+        {
+            var startPrice = priceRange.Split('-')[0];
+            var endPrice = priceRange.Split('-')[1];
+            return pets.Where(pet => pet.Price >= int.Parse(startPrice) && pet.Price <= int.Parse(endPrice)).ToList();
+        }
+
         [HttpDelete("Pets/{name}")]
         public void BuyPetByName(string name)
         {
