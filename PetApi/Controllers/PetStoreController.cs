@@ -58,6 +58,13 @@ namespace PetApi.Controllers
         }
 
         [HttpGet]
+        [Route("FindPetByPriceRange/")]
+        public List<Pet> GetPetByPriceRange(int min, int max)
+        {
+            return pets.Where(x => x.Price >= min && x.Price <= max).ToList();
+        }
+
+        [HttpGet]
         [Route("FindPetByItsColor/")]
         public List<Pet> GetPetByItsColor(string color)
         {
