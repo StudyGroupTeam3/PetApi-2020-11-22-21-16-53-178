@@ -59,11 +59,11 @@ namespace PetApi.Controllers
             pets.Remove(pets.FirstOrDefault(pet => pet.Name == name));
         }
 
-        [HttpPut("Pets/{name}")]
-        public Pet ModifyPriceByName(string name, Pet newPet)
+        [HttpPut("modifyPetPrice")]
+        public Pet ModifyPriceByName(Pet newPet)
         {
-            var petFound = pets.FirstOrDefault(pet => pet.Name == name);
-            petFound = newPet;
+            var petFound = pets.FirstOrDefault(pet => pet.Name == newPet.Name);
+            petFound.Price = newPet.Price;
 
             return petFound;
         }

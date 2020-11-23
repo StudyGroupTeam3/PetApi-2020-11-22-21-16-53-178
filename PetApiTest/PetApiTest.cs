@@ -232,5 +232,34 @@ namespace PetApiTest
 
             Assert.Equal(expected, actualPet);
         }
+
+        // petStore/modifyPetPrice
+        [Fact]
+        public async void Should_Modify_Pet_Price_When_Modify_Pet_Price()
+        {
+            // given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+            await client.DeleteAsync("petStore/clear");
+
+            Pet pet = new Pet("Bavmax", "dog", "white", 5000);
+            string request = JsonConvert.SerializeObject(pet);
+            StringContent requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            await client.PostAsync("petStore/addNewPet", requestBody);
+
+            // when
+            Pet pet2 = new Pet("Bavmax", "dog", "white", 50);
+            string request2 = JsonConvert.SerializeObject(pet2);
+            StringContent requestBody2 = new StringContent(request2, Encoding.UTF8, "application/json");
+            await client.PutAsync("petStore/modifyPetPrice", requestBody2);
+
+            var response = await client.GetAsync($"petStore/Pets/Bavmax");
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            Pet actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
+
+            Assert.Equal(50, actualPet.Price);
+        }
     }
 }
