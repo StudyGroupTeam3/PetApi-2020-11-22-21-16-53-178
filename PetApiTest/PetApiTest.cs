@@ -83,7 +83,7 @@ namespace PetApiTest
         }
 
         [Fact]
-        public async Task Should_Delete_Pet_When_It_is_Bought()
+        public async Task Should_Delete_Pet_When_It_Is_Bought()
         {
             // given
             TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
@@ -105,6 +105,32 @@ namespace PetApiTest
             var responseString = await response.Content.ReadAsStringAsync();
             List<Pet> acutalPet = JsonConvert.DeserializeObject<List<Pet>>(responseString);
             Assert.False(acutalPet.Contains(pet2));
+        }
+
+        [Fact]
+        public async Task Should_Modify_Pet_Price_When_It_is_Needed()
+        {
+            // given
+            TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
+            HttpClient client = server.CreateClient();
+
+            Pet pet1 = new Pet(name: "WangWang", type: "dog", color: "Black", price: 3000);
+            string request1 = JsonConvert.SerializeObject(pet1);
+            StringContent requestBody1 = new StringContent(request1, Encoding.UTF8, "application/json");
+            await client.PostAsync("PetStore/addNewPet", requestBody1);
+
+            Pet pet2 = new Pet(name: "WangWang", type: "dog", color: "Black", price: 5000);
+            string request2 = JsonConvert.SerializeObject(pet2);
+            StringContent requestBody2 = new StringContent(request2, Encoding.UTF8, "application/json");
+            await client.PostAsync("PetStore/addNewPet", requestBody2);
+
+            // when
+            var response = await client.PatchAsync("PetStore/ModifyPetPrice", requestBody2);
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            Pet acutalPet = JsonConvert.DeserializeObject<Pet>(responseString);
+            Assert.NotEqual(pet1.Price, acutalPet.Price);
         }
     }
 }

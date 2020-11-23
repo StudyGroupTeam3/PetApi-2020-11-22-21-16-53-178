@@ -42,6 +42,15 @@ namespace PetApi.Controllers
             return pets;
         }
 
+        [HttpPatch]
+        [Route("ModifyPetPrice")]
+        public Pet ModifyPrice(Pet pet)
+        {
+            var modifiedPet = pets.FirstOrDefault(x => x.Name == pet.Name);
+            modifiedPet.Price = pet.Price;
+            return modifiedPet;
+        }
+
         [HttpDelete("clear")]
         public void Clear()
         {
