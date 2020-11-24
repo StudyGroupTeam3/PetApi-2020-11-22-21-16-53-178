@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using PetApi;
@@ -13,7 +12,7 @@ using Xunit;
 
 namespace PetApiTest
 {
-    public class PetApiTest : IDisposable
+    public class PetApiTest
     {
         private readonly TestServer server = new TestServer(new WebHostBuilder().UseStartup<Startup>());
         private readonly HttpClient client;
@@ -21,10 +20,6 @@ namespace PetApiTest
         {
             client = server.CreateClient();
             client.DeleteAsync("petStore/clear");
-        }
-
-        public void Dispose()
-        {
         }
 
         // petStore/addNewPet
@@ -186,6 +181,27 @@ namespace PetApiTest
             var actualPets = JsonConvert.DeserializeObject<List<Pet>>(responseString);
 
             Assert.Equal(expectedPets, actualPets);
+        }
+
+        // petStore
+        [Fact]
+        public async void Patch_Should_Modify_Pet_Price_When_Modify_Pet_Price()
+        {
+            // given
+            await AddPets();
+
+            // when
+            var updateData = new UpdateModel("Tom", 10);
+            var request = JsonConvert.SerializeObject(updateData);
+            var requestBody = new StringContent(request, Encoding.UTF8, "application/json");
+            var response = await client.PatchAsync("petStore", requestBody);
+
+            // then
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            var actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
+
+            Assert.Equal(updateData.Price, actualPet.Price);
         }
 
         private async Task<List<Pet>> AddPets()

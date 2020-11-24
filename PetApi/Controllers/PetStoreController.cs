@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PetApi.Models;
+using PetApiTest;
 
 namespace PetApi.Controllers
 {
@@ -64,6 +65,15 @@ namespace PetApi.Controllers
         {
             var petFound = pets.FirstOrDefault(pet => pet.Name == newPet.Name);
             petFound.Price = newPet.Price;
+
+            return petFound;
+        }
+
+        [HttpPatch]
+        public Pet ModifyPriceByName2(UpdateModel updateModel)
+        {
+            var petFound = pets.FirstOrDefault(pet => pet.Name == updateModel.Name);
+            petFound.Price = updateModel.Price;
 
             return petFound;
         }
