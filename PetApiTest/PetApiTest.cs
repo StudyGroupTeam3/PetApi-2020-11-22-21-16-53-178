@@ -78,7 +78,7 @@ namespace PetApiTest
             Assert.Equal(pets[0], actualPet);
         }
 
-        // petStore
+        // petStore/Pets/{name}
         [Fact]
         public async void AC4_Should_Get_Pet_Off_When_Buy_Pet_By_Name()
         {
@@ -86,7 +86,7 @@ namespace PetApiTest
             var pets = await AddPets();
 
             // when
-            await client.DeleteAsync($"petStore?name={pets[0].Name}");
+            await client.DeleteAsync($"petStore/Pets/{pets[0].Name}");
             pets.Remove(pets[0]);
             var response = await client.GetAsync("petStore/Pets");
 

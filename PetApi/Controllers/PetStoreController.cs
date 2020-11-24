@@ -33,14 +33,14 @@ namespace PetApi.Controllers
             return pets.FirstOrDefault(pet => pet.Name == name);
         }
 
-        [HttpDelete]
+        [HttpDelete("Pets/{name}")]
         public void BuyPetByName(string name)
         {
             pets.Remove(pets.FirstOrDefault(pet => pet.Name == name));
         }
 
         [HttpPatch]
-        public Pet ModifyPriceByName2(UpdateModel updateModel)
+        public Pet ModifyPriceByName(UpdateModel updateModel)
         {
             var petFound = pets.FirstOrDefault(pet => pet.Name == updateModel.Name);
             petFound.Price = updateModel.Price;
