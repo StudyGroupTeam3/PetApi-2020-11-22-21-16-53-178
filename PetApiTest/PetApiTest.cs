@@ -78,7 +78,7 @@ namespace PetApiTest
             Assert.Equal(pets[0], actualPet);
         }
 
-        // petStore/Pets/{name}
+        // petStore
         [Fact]
         public async void AC4_Should_Get_Pet_Off_When_Buy_Pet_By_Name()
         {
@@ -86,7 +86,7 @@ namespace PetApiTest
             var pets = await AddPets();
 
             // when
-            await client.DeleteAsync($"petStore/Pets/{pets[0].Name}");
+            await client.DeleteAsync($"petStore?name={pets[0].Name}");
             pets.Remove(pets[0]);
             var response = await client.GetAsync("petStore/Pets");
 
@@ -98,32 +98,7 @@ namespace PetApiTest
             Assert.Equal(pets, actualPets);
         }
 
-        // petStore/modifyPetPrice
-        [Fact]
-        public async void AC_5_Should_Modify_Pet_Price_When_Modify_Pet_Price()
-        {
-            // given
-            var pet = new Pet("Bavmax", "dog", "white", 5000);
-            var request = JsonConvert.SerializeObject(pet);
-            var requestBody = new StringContent(request, Encoding.UTF8, "application/json");
-            await client.PostAsync("petStore/addNewPet", requestBody);
-
-            // when
-            var newPet = new Pet("Bavmax", "dog", "white", 50);
-            var newRequest = JsonConvert.SerializeObject(newPet);
-            var newRequestBody = new StringContent(newRequest, Encoding.UTF8, "application/json");
-            await client.PutAsync("petStore/modifyPetPrice", newRequestBody);
-            var response = await client.GetAsync($"petStore/Pets/Bavmax");
-
-            // then
-            response.EnsureSuccessStatusCode();
-            var responseString = await response.Content.ReadAsStringAsync();
-            var actualPet = JsonConvert.DeserializeObject<Pet>(responseString);
-
-            Assert.Equal(newPet.Price, actualPet.Price);
-        }
-
-        // petStore/Pets/type/{type}
+        // petStore/Pets
         [Fact]
         public async void AC_6_Should_Return_Correct_Pets_When_Get_Pet_By_Type()
         {
@@ -132,7 +107,7 @@ namespace PetApiTest
 
             // when
             const string type = "dog";
-            var response = await client.GetAsync($"petStore/Pets/type/{type}");
+            var response = await client.GetAsync($"petStore/Pets?type={type}");
 
             // then
             response.EnsureSuccessStatusCode();
@@ -143,7 +118,7 @@ namespace PetApiTest
             Assert.Equal(expectedPets, actualPets);
         }
 
-        // petStore/Pets/price/{priceRange}
+        // petStore/Pets
         [Fact]
         public async void AC7_Should_Return_Correct_Pets_When_Get_Pet_In_Price_Range()
         {
@@ -151,8 +126,9 @@ namespace PetApiTest
             var pets = await AddPets();
 
             // when
-            const string priceRange = "0-1000";
-            var response = await client.GetAsync($"petStore/Pets/price/{priceRange}");
+            const int minPrice = 0;
+            const int maxPrice = 1000;
+            var response = await client.GetAsync($"petStore/Pets?minPrice={minPrice}&&maxPrice={maxPrice}");
 
             // then
             response.EnsureSuccessStatusCode();
@@ -163,7 +139,7 @@ namespace PetApiTest
             Assert.Equal(expectedPets, actualPets);
         }
 
-        // petStore/Pets/color/{color}
+        // petStore/Pets
         [Fact]
         public async void AC8_Should_Return_Correct_Pets_When_Get_Pet_By_Color()
         {
@@ -172,7 +148,7 @@ namespace PetApiTest
 
             // when
             const string color = "white";
-            var response = await client.GetAsync($"petStore/Pets/color/{color}");
+            var response = await client.GetAsync($"petStore/Pets?color={color}");
 
             // then
             response.EnsureSuccessStatusCode();
@@ -185,7 +161,7 @@ namespace PetApiTest
 
         // petStore
         [Fact]
-        public async void Patch_Should_Modify_Pet_Price_When_Modify_Pet_Price()
+        public async void AC5_Should_Modify_Pet_Price_When_Modify_Pet_Price()
         {
             // given
             await AddPets();

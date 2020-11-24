@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PetApi.Models;
 using PetApiTest;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PetApi.Controllers
 {
@@ -23,9 +21,10 @@ namespace PetApi.Controllers
         }
 
         [HttpGet("Pets")]
-        public IList<Pet> GetPets()
+        public IList<Pet> GetPetsByProperty(string color, string type, int? minPrice, int? maxPrice)
         {
-            return pets;
+            return color == null && type == null && minPrice == null && maxPrice == null
+                ? pets : pets.Where(pet => pet.Color == color || pet.Type == type || (pet.Price >= minPrice && pet.Price <= maxPrice)).ToList();
         }
 
         [HttpGet("Pets/{name}")]
@@ -34,39 +33,10 @@ namespace PetApi.Controllers
             return pets.FirstOrDefault(pet => pet.Name == name);
         }
 
-        [HttpGet("Pets/type/{type}")]
-        public List<Pet> GetPetByType(string type)
-        {
-            return pets.Where(pet => pet.Type == type).ToList();
-        }
-
-        [HttpGet("Pets/color/{color}")]
-        public List<Pet> GetPetByColor(string color)
-        {
-            return pets.Where(pet => pet.Color == color).ToList();
-        }
-
-        [HttpGet("Pets/price/{priceRange}")]
-        public List<Pet> GetPetInPriceRange(string priceRange)
-        {
-            var startPrice = priceRange.Split('-')[0];
-            var endPrice = priceRange.Split('-')[1];
-            return pets.Where(pet => pet.Price >= int.Parse(startPrice) && pet.Price <= int.Parse(endPrice)).ToList();
-        }
-
-        [HttpDelete("Pets/{name}")]
+        [HttpDelete]
         public void BuyPetByName(string name)
         {
             pets.Remove(pets.FirstOrDefault(pet => pet.Name == name));
-        }
-
-        [HttpPut("modifyPetPrice")]
-        public Pet ModifyPriceByName(Pet newPet)
-        {
-            var petFound = pets.FirstOrDefault(pet => pet.Name == newPet.Name);
-            petFound.Price = newPet.Price;
-
-            return petFound;
         }
 
         [HttpPatch]
